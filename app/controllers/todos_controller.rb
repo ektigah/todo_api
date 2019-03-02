@@ -1,22 +1,23 @@
-# app/controllers/todos_controller.rb
 class TodosController < ApplicationController
   before_action :set_todo, only: [:show, :update, :destroy]
 
   # GET /todos
   def index
-    @todos = Todo.all
+    # get current user todos
+    @todos = current_user.todos
     json_response(@todos)
-  end
-
-  # POST /todos
-  def create
-    @todo = Todo.create!(todo_params)
-    json_response(@todo, :created)
   end
 
   # GET /todos/:id
   def show
     json_response(@todo)
+  end
+
+  # POST /todos
+  def create
+    # create todos belonging to current user
+    @todo = current_user.todos.create!(todo_params)
+    json_response(@todo, :created)
   end
 
   # PUT /todos/:id
@@ -33,9 +34,9 @@ class TodosController < ApplicationController
 
   private
 
+  # remove `created_by` from list of permitted parameters
   def todo_params
-    # whitelist params
-    params.permit(:title, :created_by)
+    params.permit(:title)
   end
 
   def set_todo
